@@ -51,6 +51,7 @@ namespace Xamarin.Auth._MobileServices
         Uri redirectUrl;
         Uri accessTokenUrl;
         GetUsernameAsyncFunc getUsernameAsync;
+        private string loginHint;
 
 
         #region     State
@@ -204,6 +205,15 @@ namespace Xamarin.Auth._MobileServices
                     string.IsNullOrWhiteSpace(clientSecret)   // Client Secret is not defined
                     ;
             }
+        }
+
+        /// <summary>
+        /// Login Hint to be used to pre-fill the username/email address field of the sign-in page for the user
+        /// </summary>
+        public string LoginHint
+        {
+            get => loginHint;
+            set => loginHint = value;
         }
         ///---------------------------------------------------------------------------------------
         #endregion
@@ -552,6 +562,15 @@ namespace Xamarin.Auth._MobileServices
             //Uri.EscapeDataString (scope),
             //{"scope", this.scope},
             //{"scope", DoNotEscapeScope? this.scope : Uri.EscapeDataString (this.scope)},
+
+            if (String.IsNullOrEmpty(this.loginHint))
+            {
+                oauth_request_query_parameters.Add
+                (
+                    "login_hint",
+                    this.loginHint
+                );
+            }
 
             string scope = this.scope;
             if (DoNotEscapeScope == true)
