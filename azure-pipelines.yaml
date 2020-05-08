@@ -13,7 +13,7 @@ jobs:
   - job: build_windows_vs2019
     displayName: Build on Windows VS2019
     pool:
-      vmImage: windows-2019
+      vmImage: windows-latest
     variables:
       solution_source:              './source/**/*.sln'
       solution_samples:             './samples/**/*.sln'

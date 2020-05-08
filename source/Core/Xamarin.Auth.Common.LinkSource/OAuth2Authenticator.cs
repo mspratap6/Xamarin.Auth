@@ -563,7 +563,7 @@ namespace Xamarin.Auth._MobileServices
             //{"scope", this.scope},
             //{"scope", DoNotEscapeScope? this.scope : Uri.EscapeDataString (this.scope)},
 
-            if (String.IsNullOrEmpty(this.loginHint))
+            if (!string.IsNullOrEmpty(this.loginHint))
             {
                 oauth_request_query_parameters.Add
                 (
@@ -869,6 +869,29 @@ namespace Xamarin.Auth._MobileServices
             {
                 { "grant_type", "authorization_code" },
                 { "code", code },
+                { "redirect_uri", redirectUrl.AbsoluteUri },
+                { "client_id", clientId },
+            };
+
+            return RequestAccessTokenAsync(queryValues);
+        }
+
+        /// <summary>
+        /// Asynchronously requests a new access token with an Refresh Token <paramref name="refreshToken"/>.
+        /// </summary>
+        /// <returns>
+        /// A dictionary of data returned from the authorization request.
+        /// </returns>
+        /// <param name='refreshToken'>The Refresh Token.</param>
+        /// <remarks>Implements: https://tools.ietf.org/html/rfc6749#section-6 </remarks>
+        public Task<IDictionary<string, string>> RenewAccessTokenAsync(string refreshToken)
+        {
+            // mc++ changed protected to public for extension methods RefreshToken (Adrian Stevens) 
+
+            var queryValues = new Dictionary<string, string>
+            {
+                { "grant_type", "refresh_token" },
+                { "refresh_token", refreshToken },
                 { "redirect_uri", redirectUrl.AbsoluteUri },
                 { "client_id", clientId },
             };

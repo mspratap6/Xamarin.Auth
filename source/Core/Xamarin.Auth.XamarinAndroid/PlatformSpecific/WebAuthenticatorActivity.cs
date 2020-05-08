@@ -22,6 +22,7 @@ using Android.OS;
 using System.Threading.Tasks;
 using Xamarin.Utilities.Android;
 using System.Text;
+using Android.Views;
 
 #if ! AZURE_MOBILE_SERVICES
 namespace Xamarin.Auth
@@ -30,15 +31,15 @@ namespace Xamarin.Auth._MobileServices
 #endif
 {
     [Activity(Label = "Web Authenticator")]
-    #if XAMARIN_AUTH_INTERNAL
+#if XAMARIN_AUTH_INTERNAL
     internal partial class WebAuthenticatorActivity : global::Android.Accounts.AccountAuthenticatorActivity
-    #else
+#else
     /// Pull Request - manually added/fixed
     ///		Marshalled NavigationService.GoBack to UI Thread #94
     ///		https://github.com/xamarin/Xamarin.Auth/pull/88
     //public class WebAuthenticatorActivity : Activity
     public partial class WebAuthenticatorActivity : global::Android.Accounts.AccountAuthenticatorActivity
-    #endif
+#endif
     {
         WebView webView;
 
@@ -70,6 +71,9 @@ namespace Xamarin.Auth._MobileServices
             }
 
             Title = state.Authenticator.Title;
+
+            if (state.Authenticator.AllowCancel)
+                ActionBar.SetDisplayHomeAsUpEnabled(true);
 
             //
             // Watch for completion
@@ -133,7 +137,7 @@ namespace Xamarin.Auth._MobileServices
             };
             webView.Settings.UserAgentString = WebViewConfiguration.Android.UserAgent;
             Client web_view_client = new Client(this);  // UserAgent set in the class
-                
+
             webView.Settings.JavaScriptEnabled = true;
             webView.SetWebViewClient(web_view_client);
             SetContentView(webView);
@@ -192,6 +196,17 @@ namespace Xamarin.Auth._MobileServices
                     webView.LoadUrl(t.Result.AbsoluteUri);
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case global::Android.Resource.Id.Home:
+                    OnBackPressed();
+                    return true;
+            }
+            return base.OnOptionsItemSelected(item);
         }
 
         public override void OnBackPressed()
