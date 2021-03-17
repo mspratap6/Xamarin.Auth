@@ -603,6 +603,8 @@ namespace Xamarin.Auth._MobileServices
             oauth_request_query_parameters.Add("state", state);
             //---------------------------------------------------------------------------------------
 
+            oauth_request_query_parameters.Add("access_type", "offline");
+
             #if DEBUG
             System.Diagnostics.Debug.WriteLine("OAuth Query Parameters DEFAULT:");
             foreach (KeyValuePair<string, string> kvp in oauth_request_query_parameters)
@@ -870,8 +872,13 @@ namespace Xamarin.Auth._MobileServices
                 { "grant_type", "authorization_code" },
                 { "code", code },
                 { "redirect_uri", redirectUrl.AbsoluteUri },
-                { "client_id", clientId },
+                { "client_id", clientId }
             };
+
+            if (!string.IsNullOrEmpty(clientSecret))
+            {
+                queryValues.Add("client_secret",clientSecret);
+            }
 
             return RequestAccessTokenAsync(queryValues);
         }
@@ -896,6 +903,11 @@ namespace Xamarin.Auth._MobileServices
                 { "client_id", clientId },
             };
 
+            if (!string.IsNullOrEmpty(clientSecret))
+            {
+                queryValues["client_secret"] = clientSecret;
+            }
+
             return RequestAccessTokenAsync(queryValues);
         }
 
@@ -913,10 +925,10 @@ namespace Xamarin.Auth._MobileServices
             HttpClient client = new HttpClient();
 
             //If client secret is set, use HTTP BASIC auth to authenticate to the token endpoint
-            if (!string.IsNullOrEmpty(this.ClientSecret))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes($"{this.ClientId}:{this.ClientSecret}")));
-            }
+            //if (!string.IsNullOrEmpty(this.ClientSecret))
+            //{
+            //    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes($"{this.ClientId}:{this.ClientSecret}")));
+            //}
 
             HttpResponseMessage response = await client.PostAsync(accessTokenUrl, content).ConfigureAwait(false);
             string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
